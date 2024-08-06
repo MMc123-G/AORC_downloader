@@ -1,3 +1,4 @@
-/AORC_Downloader.ipynb
 *.zip
-
+*.nc4
+*.dss
+~$LWI_Validation_Calibration_Storm_Selection.xlsx

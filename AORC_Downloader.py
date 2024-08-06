@@ -2,48 +2,67 @@
 # It is currently setup to download from the AORC_LMRFC_4km repository for Hurricane Ida Aug 26, 2021 – Sep 4, 2021.
 # The zip files are compressed hourly netCDF files by month.
 # Ex: AORC_APCP_4KM_LMRFC_202101.zip will contain every hourly netcdf file for January, 2021.
-
+# %%
 import zipfile
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import glob, os
+import pandas as pd
+
+# %%
+# open the Validation_Calibration_Storm_Selection.xlsx as a dataframe
+df = pd.read_excel(r"LWI_Validation_Calibration_Storm_Selection.xlsx", sheet_name="Sheet1")
+
+# if the column 'End Date' is NaT, use the Start Date + 21 days as the End Date.
+df["End Date"] = df["End Date"].fillna(df["Start Date"] + pd.DateOffset(days=21))
+df
+#%%
+# Iterate the rows of the dataframe and print the storm name and start and end dates.
+for index, row in df.iterrows():
+# iterate just the first two rows for testing
+# for index, row in df.head(2).iterrows():
+
+    print('\nProcessing: ', row["Name"], row["Start Date"], row["End Date"])
 
 # stormName = "RTF_05JUL2022"
-stormName = "nonTC_Mar2022"
-outDir = rf"V:\projects\p00659_dec_glo_phase3\02_analysis\nonTropical Calibration Event Selection\aorc\{stormName}"
-# Convert string date to to datetime objects for iterating
-startDate = datetime.strptime("19MAR2022", "%d%b%Y")
-endDate = datetime.strptime("19APR2022", "%d%b%Y")
+    stormName = row["Name"]
+    outDir = rf"LWI\nc\{stormName}"
+    # outDir = rf"V:\projects\p00659_dec_glo_phase3\02_analysis\nonTropical Calibration Event Selection\aorc\{stormName}"
+    # Convert string date to to datetime objects for iterating
+    # startDate = datetime.strptime("01OCT2005", "%d%b%Y")
+    # endDate = datetime.strptime("15OCT2005", "%d%b%Y")
+    startDate = row["Start Date"]
+    endDate = row["End Date"]
 
-# Iterate by months from startdate to endDate
-date = startDate
-while date <= (endDate):
-    # Convert date to format needed for URL
-    date_str = datetime.strftime(date, "%Y%m")
-    # Download each days zip file.
-    URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/LMRFC_4km/precipitation/AORC_APCP_4KM_LMRFC_{date_str}.zip"
-    
-    response = requests.get(URL, verify=False)
-    open(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", "wb").write(response.content)
-    
-    # Unzip hourly netCDF files to a single directory. 
-    with zipfile.ZipFile(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", 'r') as zip_ref:
-        zip_ref.extractall(outDir)
-    
-    # Go to next day
-    date = date + relativedelta(months=+1)
+    # Iterate by months from startdate to endDate
+    date = startDate
+    while date <= (endDate):
+        # Convert date to format needed for URL
+        date_str = datetime.strftime(date, "%Y%m")
+        # Download each days zip file.
+        URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/LMRFC_4km/precipitation/AORC_APCP_4KM_LMRFC_{date_str}.zip"
+        
+        response = requests.get(URL, verify=False)
+        open(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", "wb").write(response.content)
+        
+        # Unzip hourly netCDF files to a single directory. 
+        with zipfile.ZipFile(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", 'r') as zip_ref:
+            zip_ref.extractall(outDir)
+        
+        # Go to next day
+        date = date + relativedelta(months=+1)
 
-# Trim unzipped data to start - end dates
-for file in os.listdir(outDir):
-    # Get all *.nc4 files
-    if file.endswith(".nc4"):
-        filepath = os.path.join(outDir, file)
-        # get the date string
-        filedate = file.split(".")[0][-10:-2]
-        # convert the date string to a datetime object
-        filedate_dt = datetime.strptime(filedate, "%Y%m%d")
-        # delete file if date of the file is out of our starDate to EndDate range.
-        if (filedate_dt < startDate) or (filedate_dt > endDate):
-            os.remove(filepath)
+    # Trim unzipped data to start - end dates
+    for file in os.listdir(outDir):
+        # Get all *.nc4 files
+        if file.endswith(".nc4"):
+            filepath = os.path.join(outDir, file)
+            # get the date string
+            filedate = file.split(".")[0][-10:-2]
+            # convert the date string to a datetime object
+            filedate_dt = datetime.strptime(filedate, "%Y%m%d")
+            # delete file if date of the file is out of our starDate to EndDate range.
+            if (filedate_dt < startDate) or (filedate_dt > endDate):
+                os.remove(filepath)
         
