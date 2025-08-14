@@ -5,32 +5,107 @@ from mil.army.usace.hec.vortex.geo import WktFactory
 import glob
 import os
 
-# cd C:\Apps\hec-hms-4.12-beta.6-win-x64
-# HEC-HMS.cmd -script "Z:\py\AORC_downloader\nc_to_dss_precip.jy"
+# cd C:\Program Files\HEC\HEC-HMS\4.12
+# HEC-HMS.cmd -script "C:\py\AORC_downloader\nc_to_dss_precip.jy"
 
 variables = ['APCP_surface']
 
-clip_shp = r"Z:\py\AORC_downloader\LWI_Bounding_Box.shp"
-wkt = 'PROJCS["NAD_1983_StatePlane_Louisiana_South_FIPS_1702_Feet",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic"],PARAMETER["False_Easting",3280833.333333333],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",-91.33333333333333],PARAMETER["Standard_Parallel_1",29.3],PARAMETER["Standard_Parallel_2",30.7],PARAMETER["Latitude_Of_Origin",28.5],UNIT["Foot_US",0.3048006096012192]]'
+clip_shp = r"C:/py/AORC_downloader/maps/I57_hms_bb_3433.shp"
+# wkt = 'PROJCS["NAD_1983_StatePlane_Louisiana_South_FIPS_1702_Feet",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic"],PARAMETER["False_Easting",3280833.333333333],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",-91.33333333333333],PARAMETER["Standard_Parallel_1",29.3],PARAMETER["Standard_Parallel_2",30.7],PARAMETER["Latitude_Of_Origin",28.5],UNIT["Foot_US",0.3048006096012192]]'
+wkt = '''BOUNDCRS[
+    SOURCECRS[
+        PROJCRS["unknown",
+            BASEGEOGCRS["unknown",
+                DATUM["Unknown based on GRS 1980 ellipsoid using towgs84=0,0,0,0,0,0,0",
+                    ELLIPSOID["GRS 1980",6378137,298.257222101,
+                        LENGTHUNIT["metre",1],
+                        ID["EPSG",7019]]],
+                PRIMEM["Greenwich",0,
+                    ANGLEUNIT["degree",0.0174532925199433],
+                    ID["EPSG",8901]]],
+            CONVERSION["unknown",
+                METHOD["Lambert Conic Conformal (2SP)",
+                    ID["EPSG",9802]],
+                PARAMETER["Latitude of false origin",34.3333333333333,
+                    ANGLEUNIT["degree",0.0174532925199433],
+                    ID["EPSG",8821]],
+                PARAMETER["Longitude of false origin",-92,
+                    ANGLEUNIT["degree",0.0174532925199433],
+                    ID["EPSG",8822]],
+                PARAMETER["Latitude of 1st standard parallel",36.2333333333333,
+                    ANGLEUNIT["degree",0.0174532925199433],
+                    ID["EPSG",8823]],
+                PARAMETER["Latitude of 2nd standard parallel",34.9333333333333,
+                    ANGLEUNIT["degree",0.0174532925199433],
+                    ID["EPSG",8824]],
+                PARAMETER["Easting at false origin",1312333.3333,
+                    LENGTHUNIT["US survey foot",0.304800609601219],
+                    ID["EPSG",8826]],
+                PARAMETER["Northing at false origin",0,
+                    LENGTHUNIT["US survey foot",0.304800609601219],
+                    ID["EPSG",8827]]],
+            CS[Cartesian,2],
+                AXIS["(E)",east,
+                    ORDER[1],
+                    LENGTHUNIT["US survey foot",0.304800609601219,
+                        ID["EPSG",9003]]],
+                AXIS["(N)",north,
+                    ORDER[2],
+                    LENGTHUNIT["US survey foot",0.304800609601219,
+                        ID["EPSG",9003]]]]],
+    TARGETCRS[
+        GEOGCRS["WGS 84",
+            DATUM["World Geodetic System 1984",
+                ELLIPSOID["WGS 84",6378137,298.257223563,
+                    LENGTHUNIT["metre",1]]],
+            PRIMEM["Greenwich",0,
+                ANGLEUNIT["degree",0.0174532925199433]],
+            CS[ellipsoidal,2],
+                AXIS["latitude",north,
+                    ORDER[1],
+                    ANGLEUNIT["degree",0.0174532925199433]],
+                AXIS["longitude",east,
+                    ORDER[2],
+                    ANGLEUNIT["degree",0.0174532925199433]],
+            ID["EPSG",4326]]],
+    ABRIDGEDTRANSFORMATION["Transformation from unknown to WGS84",
+        METHOD["Position Vector transformation (geog2D domain)",
+            ID["EPSG",9606]],
+        PARAMETER["X-axis translation",0,
+            ID["EPSG",8605]],
+        PARAMETER["Y-axis translation",0,
+            ID["EPSG",8606]],
+        PARAMETER["Z-axis translation",0,
+            ID["EPSG",8607]],
+        PARAMETER["X-axis rotation",0,
+            ID["EPSG",8608]],
+        PARAMETER["Y-axis rotation",0,
+            ID["EPSG",8609]],
+        PARAMETER["Z-axis rotation",0,
+            ID["EPSG",8610]],
+        PARAMETER["Scale difference",1,
+            ID["EPSG",8611]]]]'''
 
 geo_options = {
     'pathToShp': clip_shp,
-    'targetCellSize': '2000',
+    'targetCellSize': '1000',
     # 'targetWkt': WktFactory.shg(),
     'targetWkt': wkt,
+    # 'targetEpsg': '3433', # I57
     'resamplingMethod': 'Bilinear'
 }
 
-storms = ['Isidore', 'Oct-02', 'Feb-03', 'Feb-04', 'May-04', 'Ivan', 'Katrina', 'May-08', 'Gustav', 'Mar-09', 'Oct-09', 'Lee', 'Isaac', 'Jan-13', 'Jul-15', 'Oct-15', 'May-16', 'May-17', 'Jun-17', 'Jun-18', 'Harvey', 'Nate', 'Mar-18', 'May-19', 'Jun-19', 'Barry', 'Aug-19', 'Imelda', 'May-20', 'Cristobal', 'Laura', 'Beta_Sally', 'Delta']
+storms = ["LMRFC Apr2011", "LMRFC Dec2015"]
 # print storms
 for storm in storms:
     # print storm
-    in_dir = r"Z:/py/AORC_downloader/LWI/nc/" + storm
+    in_dir = r"C:/py/AORC_downloader/output/nc/" + storm
     # print in_dir
 
     f = glob.glob(in_dir+"/*.nc4")
+    # print f
 
-    out_dir = r"Z:/py/AORC_downloader/LWI/dss"
+    out_dir = r"C:/py/AORC_downloader/output/I57/dss"
     # print out_dir
     for afile in f:
         # print afile
@@ -40,7 +115,8 @@ for storm in storms:
         
         write_options = {
         'partA': storm,
-        'partF': 'AORC'
+        'partF': 'AORC',
+        'dataType': 'PER-CUM',
         }
 
         myImport = BatchImporter.builder() \

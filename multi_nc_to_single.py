@@ -25,3 +25,12 @@ def combine_nc_files(storm_name, out_dir):
     combined_ds.to_netcdf(output_file)
 
     print(f"Combined NetCDF file saved as: {output_file}")
+
+if __name__ == "__main__":
+    # Define storms and output directory
+    storms = ["LMRFC Apr2011", "LMRFC Dec2015"]
+    out_dir = "output/nc"
+
+    # Combine NetCDF files for each storm
+    for storm in storms:
+        combine_nc_files(storm, out_dir)

@@ -12,11 +12,38 @@ import pandas as pd
 
 # %%
 # open the Validation_Calibration_Storm_Selection.xlsx as a dataframe
-df = pd.read_excel(r"LWI_Validation_Calibration_Storm_Selection.xlsx", sheet_name="Sheet1")
+# df = pd.read_excel(r"LWI_Validation_Calibration_Storm_Selection.xlsx", sheet_name="Sheet1")
 
 # if the column 'End Date' is NaT, use the Start Date + 21 days as the End Date.
-df["End Date"] = df["End Date"].fillna(df["Start Date"] + pd.DateOffset(days=21))
+# df["End Date"] = df["End Date"].fillna(df["Start Date"] + pd.DateOffset(days=21))
+# df
+
+# %%
+
+#rfc office LMRFC, ABRFC, WGRFC, NERFC, SERFC, OHRFC, MARFC, CARFC, NCRFC, PBRFC
+rfc= "LMRFC"
+
+#  20DEC2015 - 10JAN2016
+#  15APR2011 - 07MAY2011
+calibration_storms = {
+    "Dec2015": {
+        "Start Date": datetime.strptime("20DEC2015", "%d%b%Y"),
+        "End Date": datetime.strptime("10JAN2016", "%d%b%Y")
+    },
+    "Apr2011": {
+        "Start Date": datetime.strptime("15APR2011", "%d%b%Y"),
+        "End Date": datetime.strptime("07MAY2011", "%d%b%Y")
+    },
+}
+# Convert the dictionary to a dataframe
+df = pd.DataFrame.from_dict(calibration_storms, orient='index')
+# Reset the index to have a column for storm name
+df.reset_index(inplace=True)
+# Rename the columns
+df.columns = ["Name", "Start Date", "End Date"]
+# Print the dataframe
 df
+
 #%%
 # Iterate the rows of the dataframe and print the storm name and start and end dates.
 for index, row in df.iterrows():
@@ -27,7 +54,7 @@ for index, row in df.iterrows():
 
 # stormName = "RTF_05JUL2022"
     stormName = row["Name"]
-    outDir = rf"LWI\nc\{stormName}"
+    outDir = rf"output\nc\{rfc} {stormName}"
     # outDir = rf"V:\projects\p00659_dec_glo_phase3\02_analysis\nonTropical Calibration Event Selection\aorc\{stormName}"
     # Convert string date to to datetime objects for iterating
     # startDate = datetime.strptime("01OCT2005", "%d%b%Y")
@@ -41,17 +68,20 @@ for index, row in df.iterrows():
         # Convert date to format needed for URL
         date_str = datetime.strftime(date, "%Y%m")
         # Download each days zip file.
-        URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/LMRFC_4km/precipitation/AORC_APCP_4KM_LMRFC_{date_str}.zip"
+        # URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/LMRFC_4km/precipitation/AORC_APCP_4KM_LMRFC_{date_str}.zip"
+        URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/{rfc}_4km/precipitation/AORC_APCP_4KM_{rfc}_{date_str}.zip"
         
         response = requests.get(URL, verify=False)
         open(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", "wb").write(response.content)
         
         # Unzip hourly netCDF files to a single directory. 
-        with zipfile.ZipFile(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", 'r') as zip_ref:
+        with zipfile.ZipFile(f"AORC_APCP_4KM_{rfc}_{date_str}.zip", 'r') as zip_ref:
             zip_ref.extractall(outDir)
         
-        # Go to next day
+        # Go to next month
         date = date + relativedelta(months=+1)
+        # set the date to the first of the month
+        date = date.replace(day=1)
 
     # Trim unzipped data to start - end dates
     for file in os.listdir(outDir):
@@ -66,3 +96,5 @@ for index, row in df.iterrows():
             if (filedate_dt < startDate) or (filedate_dt > endDate):
                 os.remove(filepath)
         
+
+# %%
