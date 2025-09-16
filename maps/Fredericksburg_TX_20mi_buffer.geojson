@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fredericksburg, TX 20mi buffer"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-99.0631, 30.0532],
+            [-98.4631, 30.0532],
+            [-98.4631, 30.8532],
+            [-99.0631, 30.8532],
+            [-99.0631, 30.0532]
+          ]
+        ]
+      }
+    }
+  ]
+}

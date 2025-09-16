@@ -21,7 +21,7 @@ import pandas as pd
 # %%
 
 #rfc office LMRFC, ABRFC, WGRFC, NERFC, SERFC, OHRFC, MARFC, CARFC, NCRFC, PBRFC
-rfc= "LMRFC"
+rfc= "WGRFC"
 
 #  20DEC2015 - 10JAN2016
 #  15APR2011 - 07MAY2011
@@ -35,8 +35,8 @@ calibration_storms = {
     #     "End Date": datetime.strptime("07MAY2011", "%d%b%Y")
     # },
     "Apr2017": {
-        "Start Date": datetime.strptime("20APR2017", "%d%b%Y"),
-        "End Date": datetime.strptime("07MAY2017", "%d%b%Y")
+        "Start Date": datetime.strptime("29APR2021", "%d%b%Y"),
+        "End Date": datetime.strptime("03MAY2021", "%d%b%Y")
     },
 }
 # Convert the dictionary to a dataframe
@@ -76,7 +76,7 @@ for index, row in df.iterrows():
         URL = f"https://hydrology.nws.noaa.gov/pub/AORC/V1.1/{rfc}_4km/precipitation/AORC_APCP_4KM_{rfc}_{date_str}.zip"
         
         response = requests.get(URL, verify=False)
-        open(f"AORC_APCP_4KM_LMRFC_{date_str}.zip", "wb").write(response.content)
+        open(f"AORC_APCP_4KM_{rfc}_{date_str}.zip", "wb").write(response.content)
         
         # Unzip hourly netCDF files to a single directory. 
         with zipfile.ZipFile(f"AORC_APCP_4KM_{rfc}_{date_str}.zip", 'r') as zip_ref:
