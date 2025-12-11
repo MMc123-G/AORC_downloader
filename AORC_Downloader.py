@@ -34,9 +34,9 @@ calibration_storms = {
     #     "Start Date": datetime.strptime("15APR2011", "%d%b%Y"),
     #     "End Date": datetime.strptime("07MAY2011", "%d%b%Y")
     # },
-    "Apr2017": {
-        "Start Date": datetime.strptime("29APR2021", "%d%b%Y"),
-        "End Date": datetime.strptime("03MAY2021", "%d%b%Y")
+    "2024toCurrent": {
+        "Start Date": datetime.strptime("01JUN2024", "%d%b%Y"),
+        "End Date": datetime.strptime("01DEC2025", "%d%b%Y")
     },
 }
 # Convert the dictionary to a dataframe
