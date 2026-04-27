@@ -13,15 +13,16 @@ import os
 
 # %%
 # open a sample NetCDF file to check variable names in xarray
-ds = xr.open_dataset("output/nc/Apr2025/AORC_APCP_ABRFC_2025040600.nc4")
+# ds = xr.open_dataset("output/nc/Apr2025/AORC_APCP_ABRFC_2025040600.nc4")
+ds = xr.open_dataset("output/nc/LMRFC Apr2025_combined.nc4")
 ds
 # %%
 # Settings
-storm = "Jun2021"  # change as needed
+storm = "LMRFC Apr2025"  # change as needed
 netcdf_folder = f"output/nc/{storm}"
 output_video = f"{storm}.mp4"
 varname = "APCP_surface"  # change as needed
-vmin, vmax = -2, 2  # adjust color range
+vmin, vmax = 0, 25  # mm/hr, adjust as needed
 dpi = 150
 
 # Collect all NetCDF files
@@ -39,14 +40,15 @@ frame_paths = []
 import geopandas as gpd
 
 # Load GeoJSON area of interest (AOI)
-geojson_path = "maps/HMS_Coarse_Model_BB.geojson"
+geojson_path = r"C:\Users\MBMcManus\OneDrive - Garver\Documents\Work\I57\GIS\I57_hms_bb.shp"
 aoi = gpd.read_file(geojson_path)
 
 # load the subbasins shapefile
-subbasins_path = "maps\Subbasins_HMS_Coarse.shp"
+subbasins_path = r"C:\Users\MBMcManus\OneDrive - Garver\Documents\Work\I57\I-57_HMS_Subbasins.shp"
 subbasins = gpd.read_file(subbasins_path)
-# reproject subbasins to match the AOI
-subbasins = subbasins.to_crs(aoi.crs)
+# reproject subbasins and AOI to lat/lon to match cartopy's PlateCarree
+subbasins = subbasins.to_crs("EPSG:4326")
+aoi = aoi.to_crs("EPSG:4326")
 # Plot the AOI and subbasins
 fig, ax = plt.subplots(figsize=(10, 10))
 aoi.plot(ax=ax, color='lightblue', edgecolor='black', alpha=0.5)
@@ -72,7 +74,9 @@ for i, file in enumerate(file_list):
 
     fig = plt.figure(figsize=(8, 6))
     ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.set_extent([-98, -99, 34, 35], crs=ccrs.PlateCarree())
+    minx, miny, maxx, maxy = subbasins.total_bounds
+    pad = 0.5
+    ax.set_extent([minx - pad, maxx + pad, miny - pad, maxy + pad], crs=ccrs.PlateCarree())
 
     # ax.coastlines()
     # ax.add_feature(cfeature.BORDERS, linestyle=':')

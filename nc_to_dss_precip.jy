@@ -96,7 +96,7 @@ geo_options = {
 }
 
 # storms = ["LMRFC Apr2011", "LMRFC Dec2015"]
-storms = ["LMRFC Apr2017"]
+storms = ["LMRFC Apr2017","LMRFC Apr2025"]
 # print storms
 for storm in storms:
     # print storm

@@ -30,13 +30,13 @@ calibration_storms = {
     #     "Start Date": datetime.strptime("20DEC2015", "%d%b%Y"),
     #     "End Date": datetime.strptime("10JAN2016", "%d%b%Y")
     # },
-    # "Apr2011": {
-    #     "Start Date": datetime.strptime("15APR2011", "%d%b%Y"),
-    #     "End Date": datetime.strptime("07MAY2011", "%d%b%Y")
-    # },
+    "Apr2025": {
+        "Start Date": datetime.strptime("01APR2025", "%d%b%Y"),
+        "End Date": datetime.strptime("20MAY2025", "%d%b%Y")
+    },
     "Apr2017": {
         "Start Date": datetime.strptime("20APR2017", "%d%b%Y"),
-        "End Date": datetime.strptime("07MAY2017", "%d%b%Y")
+        "End Date": datetime.strptime("01JUL2017", "%d%b%Y")
     },
 }
 # Convert the dictionary to a dataframe
